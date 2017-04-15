@@ -24,19 +24,21 @@ const numRows = 10
 const numCols = 10
 const gridHeight = 500
 const gridWidth = 500
-var gridData = gridData(numRows, numCols, gridWidth, gridHeight)
+var state = gridData(numRows, numCols, gridWidth, gridHeight)
 
-// initialize grid
-var grid = d3.select("#life")
-  .append("svg")
-  .attr("width", (gridWidth + 10) + "px")
-  .attr("height", (gridHeight + 10) + "px")
+function redrawAll (gridData) {
+  d3.select("svg").remove();
+  // initialize grid
+  var grid = d3.select("#life")
+    .append("svg")
+    .attr("width", (gridWidth + 10) + "px")
+    .attr("height", (gridHeight + 10) + "px")
 
-// create each row
-var row = grid.selectAll(".row")
-  .data(gridData)
-  .enter().append("g")
-  .attr("class", "row")
+  // create each row
+  var row = grid.selectAll(".row")
+    .data(gridData)
+    .enter().append("g")
+    .attr("class", "row")
 
   // create each square
   row.selectAll(".square")
@@ -51,13 +53,14 @@ var row = grid.selectAll(".row")
     .style("stroke-width", 0)
     .style("stroke", "#000")
 
-function fillActiveSquares () {
+  // fill active squares
   d3.selectAll(".square")
     .filter((d, i) => d.active)
     .style("fill", "#888")
 }
 
 function animate () {
+  redrawAll(state)
   // define directions
   const dirs = [
     [-1, -1], [0, -1], [1, -1],
@@ -65,21 +68,37 @@ function animate () {
     [-1, 1],  [0, 1],  [1, 1],
   ]
 
+  var nextState = state.slice()
+
   function getNeighbors (x, y) {
     return dirs.reduce((prev, dir) => {
       var isActive = false
       try {
-        isActive = isActive || gridData[x + dir[0]][y + dir[1]].active
+        isActive = isActive || state[x + dir[0]][y + dir[1]].active
       } catch(e) { }
       return prev + isActive
     }, 0)
   }
 
-  // set number of neighbors
-  d3.selectAll(".square")
-    .attr("neighbors", d => getNeighbors(d.row, d.col))
+  for(var row = 0; row < state.length; row++) {
+    for(var col = 0; col < state[0].length; col++) {
+      alive = nextState[row][col].active
+      neighbors = getNeighbors(row, col)
+      if(alive && neighbors < 2) {
+        nextState[row][col].active = false
+      } else if (alive && [2,3].indexOf(neighbors) >= 0) {
+        nextState[row][col].active = true
+      } else if (alive && neighbors > 3) {
+        nextState[row][col].active = false
+      } else if (!alive && neighbors == 3) {
+        nextState[row][col].active = true
+      }
+    }
+  }
 
+  state = nextState
+
+  setTimeout(animate, 100)
 }
 
-fillActiveSquares()
 animate()
