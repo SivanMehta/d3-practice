@@ -38,7 +38,6 @@ var row = grid.selectAll(".row")
   .enter().append("g")
   .attr("class", "row")
 
-function fillSquares () {
   // create each square
   row.selectAll(".square")
     .data(d => d)
@@ -50,14 +49,13 @@ function fillSquares () {
     .attr("height", d => d.height)
     .style("fill", "#fff")
     .style("stroke-width", 0)
+    .style("stroke", "#000")
 
-  // color active cells
+function fillActiveSquares () {
   d3.selectAll(".square")
     .filter((d, i) => d.active)
     .style("fill", "#888")
 }
-
-fillSquares()
 
 function animate () {
   // define directions
@@ -77,8 +75,11 @@ function animate () {
     }, 0)
   }
 
+  // set number of neighbors
   d3.selectAll(".square")
     .attr("neighbors", d => getNeighbors(d.row, d.col))
+
 }
 
+fillActiveSquares()
 animate()
