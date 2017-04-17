@@ -26,6 +26,8 @@ const gridHeight = 750
 const gridWidth = 750
 var state = gridData(numRows, numCols, gridWidth, gridHeight)
 
+// there has to be a more efficient way than just redrawing
+// everything possible
 function redrawAll (gridData) {
   d3.select("svg").remove();
   // initialize grid
