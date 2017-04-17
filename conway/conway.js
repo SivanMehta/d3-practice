@@ -12,7 +12,7 @@ function gridData(rows = 10, cols = 10, width = 100, height = 100) {
         posY: row * cellHeight + 1,
         width: cellWidth,
         height: cellHeight,
-        active: Math.random() > .5
+        active: Math.random() > .9
       })
     }
   }
@@ -20,10 +20,10 @@ function gridData(rows = 10, cols = 10, width = 100, height = 100) {
 }
 
 // populate grid data
-const numRows = 10
-const numCols = 10
-const gridHeight = 500
-const gridWidth = 500
+const numRows = 100
+const numCols = 100
+const gridHeight = 750
+const gridWidth = 750
 var state = gridData(numRows, numCols, gridWidth, gridHeight)
 
 function redrawAll (gridData) {
