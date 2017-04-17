@@ -8,24 +8,24 @@ class Minesweeper {
       .append("svg")
       .attr("width", (window.innerWidth + 10) + "px")
       .attr("height", (window.innerHeight + 10) + "px")
+      .attr("class", "minesweeper")
   }
 
   render() {
-    const cellWidth = window.innerWidth / this.width
+    const cellWidth = (window.innerWidth - 20) / this.width
 
-    this.cells.forEach(cell => {
-      this.grid.append('rect')
-      .attr('x', cell.col * cellWidth)
-      .attr('y', cell.row * cellWidth)
+    this.grid.selectAll('rect')
+      .data(this.cells).enter().append('rect')
+      .attr('x', c => c.col * cellWidth)
+      .attr('y', c => c.row * cellWidth)
       .attr('width', cellWidth)
       .attr('height', cellWidth)
       .style('fill', '#fff')
       .style('stroke', '#000')
-    })
   }
 }
 
-const width = 10
+const width = 20
 const height = 10
 
 var game = new Minesweeper(width, height, 5)
