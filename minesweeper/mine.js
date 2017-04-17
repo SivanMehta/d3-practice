@@ -9,10 +9,22 @@ class Minesweeper {
       .attr("width", (window.innerWidth + 10) + "px")
       .attr("height", (window.innerHeight + 10) + "px")
       .attr("class", "minesweeper")
+
   }
 
-  getColor(value) {
-    return "rgb(0,"+ (value * 32) + ",0)"
+  toggleCell(cell) {
+    function getColor(value) {
+      return "rgb(0,"+ (value * 32) + ",0)"
+    }
+
+    console.log(cell)
+    cell.revealed = !cell.revealed
+
+    var color = cell.value < 0 ? "#f00" : getColor(cell.value)
+    color = cell.value == 0 ? "#fff" : color
+    color = cell.revealed ? color : "#000"
+
+    d3.select(this).style("fill", color)
   }
 
   render() {
@@ -25,13 +37,9 @@ class Minesweeper {
       .attr('y', c => c.row * cellWidth)
       .attr('width', cellWidth)
       .attr('height', cellWidth)
-      .style('fill', c => c.value >= 0 ? this.getColor(c.value) : "#f00")
+      .style('fill', "#000")
       .style('stroke', '#000')
-      .on('click', function(d) {
-        console.log(d)
-        d.clicks ++
-        d3.select(this).style("fill", (d.clicks % 2 == 0) ? "#0f0" : "#0f0")
-      })
+      .on('click', this.toggleCell)
 
     this.grid.selectAll('text')
       .data(this.cells).enter().append('text')
@@ -55,7 +63,7 @@ for(var i = 0; i < width * height; i ++) {
     row: Math.floor(i / width),
     col: i % width,
     value: 0,
-    clicks: 0,
+    revealed: false,
     flagged: false
   })
 }
