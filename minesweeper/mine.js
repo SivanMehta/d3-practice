@@ -11,6 +11,10 @@ class Minesweeper {
       .attr("class", "minesweeper")
   }
 
+  getColor(value) {
+    return "rgb(0,"+ (value * 32) + ",0)"
+  }
+
   render() {
     const cellWidth = (window.innerWidth - 20) / this.width
 
@@ -21,7 +25,7 @@ class Minesweeper {
       .attr('y', c => c.row * cellWidth)
       .attr('width', cellWidth)
       .attr('height', cellWidth)
-      .style('fill', c => c.value >= 0 ? '#fff' : "#f00")
+      .style('fill', c => c.value >= 0 ? this.getColor(c.value) : "#f00")
       .style('stroke', '#000')
       .on('click', function(d) {
         console.log(d)
@@ -41,13 +45,13 @@ class Minesweeper {
 
 const width = 20
 const height = 10
-mines = 10
+mines = 30
 
 var game = new Minesweeper(width, height, 5)
-var cells = Array()
+game.cells = Array()
 
 for(var i = 0; i < width * height; i ++) {
-  cells.push({
+  game.cells.push({
     row: Math.floor(i / width),
     col: i % width,
     value: 0,
@@ -61,11 +65,34 @@ mineIncedes = mineIncedes.sort((a, b) => (0.5 - Math.random()))
 mineIncedes = mineIncedes.slice(0, mines)
 
 mineIncedes.forEach(index => {
-  cells[index].value = -1
+  game.cells[index].value = -1
 })
 
+function surroundingBombs (cell, i, board) {
+  const row = cell.row
+  const col = cell.col
+  const dirs = [
+    [-1, -1], [0, -1], [1, -1],
+    [-1, 0],           [1, 0],
+    [-1, 1],  [0, 1],  [1, 1],
+  ]
 
-// shuffle around mines
-game.cells = cells.sort((a, b) => (0.5 - Math.random()))
+  const bombs = dirs.reduce((prev, cur) => {
+    const dx = cur[0]
+    const dy = cur[1]
+    const index = (row + dy) * width + col + dx
+    var isBomb = 0
+    try {
+      isBomb += board[index].value == -1 ? 1 :0
+    } catch (e) { }
+    return prev + isBomb
+  }, 0)
 
+  return bombs
+}
+
+const bombCounts = game.cells.map(surroundingBombs)
+game.cells.forEach((cell, i) => {
+  cell.value = cell.value >= 0 ? bombCounts[i] : cell.value
+})
 game.render()
