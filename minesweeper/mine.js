@@ -14,38 +14,53 @@ class Minesweeper {
   render() {
     const cellWidth = (window.innerWidth - 20) / this.width
 
-    this.grid.selectAll('rect')
+    this.grid.selectAll('.cell')
       .data(this.cells).enter().append('rect')
+      .attr('class', 'cell')
       .attr('x', c => c.col * cellWidth)
       .attr('y', c => c.row * cellWidth)
       .attr('width', cellWidth)
       .attr('height', cellWidth)
       .style('fill', '#fff')
       .style('stroke', '#000')
+      .on('click', function(d) {
+        console.log(d)
+        d.clicks ++
+        d3.select(this).style("fill", (d.clicks % 2 == 0) ? "#0f0" : "#0f0")
+      })
+
+    this.grid.selectAll('text')
+      .data(this.cells).enter().append('text')
+      .attr('x', c => c.col * cellWidth + cellWidth * .5)
+      .attr('y', c => c.row * cellWidth + cellWidth * .5)
+      .attr('text-anchor', 'middle')
+      .text(c => c.value)
+
   }
 }
 
 const width = 20
 const height = 10
+mines = 10
 
 var game = new Minesweeper(width, height, 5)
-game.cells = Array()
+var cells = Array()
 
 for(var i = 0; i < width * height; i ++) {
-  game.cells.push({
+  cells.push({
     row: Math.floor(i / width),
     col: i % width,
     value: 0,
-    revealed: false,
+    clicks: 0,
     flagged: false
   })
 }
 
-for(var mine = 0; mine < this.mines; mine ++) {
-  game.cells[mine].value = -1
+for(var mine = 0; mine < mines; mine ++) {
+  cells[mine].value = -1
 }
 
 // shuffle around mines
-game.cells.sort((a, b) => (0.5 - Math.random()))
+game.cells = cells.sort((a, b) => (0.5 - Math.random()))
 
 game.render()
