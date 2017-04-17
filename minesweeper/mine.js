@@ -21,7 +21,7 @@ class Minesweeper {
       .attr('y', c => c.row * cellWidth)
       .attr('width', cellWidth)
       .attr('height', cellWidth)
-      .style('fill', '#fff')
+      .style('fill', c => c.value >= 0 ? '#fff' : "#f00")
       .style('stroke', '#000')
       .on('click', function(d) {
         console.log(d)
@@ -56,9 +56,14 @@ for(var i = 0; i < width * height; i ++) {
   })
 }
 
-for(var mine = 0; mine < mines; mine ++) {
-  cells[mine].value = -1
-}
+var mineIncedes = [...Array(width*height).keys()]
+mineIncedes = mineIncedes.sort((a, b) => (0.5 - Math.random()))
+mineIncedes = mineIncedes.slice(0, mines)
+
+mineIncedes.forEach(index => {
+  cells[index].value = -1
+})
+
 
 // shuffle around mines
 game.cells = cells.sort((a, b) => (0.5 - Math.random()))
