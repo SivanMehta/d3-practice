@@ -9,7 +9,6 @@ class Minesweeper {
       .attr("width", (window.innerWidth + 10) + "px")
       .attr("height", (window.innerHeight + 10) + "px")
       .attr("class", "minesweeper")
-
   }
 
   render() {
@@ -27,7 +26,15 @@ class Minesweeper {
       .on('click', function (cell) {
         console.log(cell)
 
-        var color = cell.value < 0 ? "#f00" : getColor(cell.value)
+        var color;
+        if(cell.value < 0) {
+          color = "#f00"
+          alert("You suck!")
+          return
+        } else {
+          color = getColor(cell.value)
+          score += 1
+        }
         color = cell.value == 0 ? "#fff" : color
 
         // color in the cell and remove click handler
@@ -41,6 +48,9 @@ class Minesweeper {
           .attr('text-anchor', 'middle')
           .attr('fill', '#000')
           .text(_ => cell.value)
+        // update the score
+        d3.select("#score")
+          .text(score)
       })
   }
 }
