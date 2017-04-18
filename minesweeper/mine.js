@@ -62,6 +62,37 @@ var grid = d3.select("#sweep")
   .attr("class", "minesweeper")
 const cellWidth = (window.innerWidth - 20) / width
 
+function revealCell(cell) {
+  console.log(cell)
+
+  var color;
+  if(cell.value < 0) {
+    color = "#f00"
+    alert("You suck!")
+    return
+  } else {
+    color = getColor(cell.value)
+    score += 1
+  }
+  color = cell.value == 0 ? "#fff" : color
+
+  // color in the cell and remove click handler
+  d3.select(this)
+  .style("fill", color)
+  .on('click', null)
+  // add the appropriate text
+  d3.select("#sweep svg").append('text')
+  .attr('x', _ => cell.col * cellWidth + cellWidth * .5)
+  .attr('y', _ => cell.row * cellWidth + cellWidth * .5)
+  .attr('text-anchor', 'middle')
+  .attr('fill', '#000')
+  .text(_ => cell.value)
+  // update the score
+  d3.select("#score")
+  .text(score)
+}
+
+// render cells
 grid.selectAll('.cell')
   .data(cells).enter().append('rect')
   .attr('class', 'cell')
@@ -71,32 +102,4 @@ grid.selectAll('.cell')
   .attr('height', cellWidth)
   .style('fill', "#000")
   .style('stroke', '#000')
-  .on('click', function (cell) {
-    console.log(cell)
-
-    var color;
-    if(cell.value < 0) {
-      color = "#f00"
-      alert("You suck!")
-      return
-    } else {
-      color = getColor(cell.value)
-      score += 1
-    }
-    color = cell.value == 0 ? "#fff" : color
-
-    // color in the cell and remove click handler
-    d3.select(this)
-      .style("fill", color)
-      .on('click', null)
-    // add the appropriate text
-    d3.select("#sweep svg").append('text')
-      .attr('x', _ => cell.col * cellWidth + cellWidth * .5)
-      .attr('y', _ => cell.row * cellWidth + cellWidth * .5)
-      .attr('text-anchor', 'middle')
-      .attr('fill', '#000')
-      .text(_ => cell.value)
-    // update the score
-    d3.select("#score")
-      .text(score)
-  })
+  .on('click', revealCell)
