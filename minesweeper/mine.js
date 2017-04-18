@@ -62,6 +62,10 @@ var grid = d3.select("#sweep")
   .attr("class", "minesweeper")
 const cellWidth = (window.innerWidth - 20) / width
 
+function lose (cell) {
+  d3.select("#sweep").remove()
+}
+
 function revealCell(cell) {
   console.log(cell)
 
@@ -69,7 +73,7 @@ function revealCell(cell) {
   if(cell.value < 0) {
     color = "#f00"
     alert("You suck!")
-    return
+    lose()
   } else {
     color = getColor(cell.value)
     score += 1
@@ -88,7 +92,7 @@ function revealCell(cell) {
     .attr('text-anchor', 'middle')
     .attr('fill', '#000')
     .text(_ => cell.value)
-  
+
   // update the score
   d3.select("#score")
     .text(score)
