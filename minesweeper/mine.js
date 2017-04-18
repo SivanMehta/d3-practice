@@ -12,19 +12,18 @@ class Minesweeper {
 
   }
 
-  toggleCell(cell) {
+  revealCell(cell) {
     function getColor(value) {
       return "rgb(0,"+ (value * 32) + ",0)"
     }
 
     console.log(cell)
-    cell.revealed = !cell.revealed
 
     var color = cell.value < 0 ? "#f00" : getColor(cell.value)
     color = cell.value == 0 ? "#fff" : color
-    color = cell.revealed ? color : "#000"
 
     d3.select(this).style("fill", color)
+    d3.select(this).on('click', null)
   }
 
   render() {
@@ -39,7 +38,7 @@ class Minesweeper {
       .attr('height', cellWidth)
       .style('fill', "#000")
       .style('stroke', '#000')
-      .on('click', this.toggleCell)
+      .on('click', this.revealCell)
 
     this.grid.selectAll('text')
       .data(this.cells).enter().append('text')
