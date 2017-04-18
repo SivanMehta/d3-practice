@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
@@ -11,10 +12,31 @@
           A list of projects created by <a href = "https://sivanmehta.github.io/">me</a>
           so I could learn <a href = "https://d3js.org/">D3.js</a>
         </blockquote>
-        <ul>
-          <li><a href = "conway/life.html">Conway's Game of Life</a> (Currently very slow)</li>
-          <li><a href = "minesweeper/sweep.html">Minesweeper</a> (in progress)</li>
-        </ul>
+        <div class = "list-group">
+          <a href="conway/life.html" class="list-group-item list-group-item-action flex-column align-items-start">
+            <div class="d-flex w-100 justify-content-between">
+              <h5 class="mb-1">Minesweeper</h5>
+              <small>In progress</small>
+            </div>
+            <p class="mb-1">
+              An implementation of minesweeper. I aim to make the entire gameplay eventually,
+              but for now it looks pretty crap, as it doesn't do anything other than reveal
+              the cell's value.
+            </p>
+          </a>
+          <a href="conway/life.html" class="list-group-item list-group-item-action flex-column align-items-start">
+            <div class="d-flex w-100 justify-content-between">
+              <h5 class="mb-1">Conway's Game of Life</h5>
+              <small>Completed</small>
+            </div>
+            <p class="mb-1">
+              This is a basic implementation of Conway's Game of Life in D3. Currently,
+              it is very slow as is re-renders the <i>entire</i> board through each
+              generation, rather than just reassigning the colors for active or inactive
+              cells, which is desirable in any form of cellular automata problem.
+            </p>
+          </a>
+        </div>
     </div>
   </body>
 </html>
