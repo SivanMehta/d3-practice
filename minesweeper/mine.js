@@ -103,8 +103,8 @@ function revealCell(cell) {
 function toggleFlag(cell) {
   d3.event.preventDefault()
 
-  // if not flagged, render the bomb icon
   if(!cell.flagged) {
+    // if not flagged, render the bomb icon
     score -= 1
     d3.select("#sweep svg").append('text')
       .attr('x', _ => cell.col * cellWidth + cellWidth * .5)
@@ -113,14 +113,11 @@ function toggleFlag(cell) {
       .attr('fill', '#F00')
       .attr('id', 'cell-flag-' + cell.row + '-' + cell.col)
       .text(_ => 'F')
+
     cell.flagged = true
   } else {
-    // otherwise just turn to black
-    d3.select('#cell-flag-' + cell.row + '-' + cell.col)
-      .text(_ => '')
-      .style('fill', '#000')
-      .on('click', revealCell)
-      .on('contextmenu', toggleFlag)
+    // otherwise just remove the flaf
+    d3.select('#cell-flag-' + cell.row + '-' + cell.col).remove()
 
     score += 1
     cell.flagged = false
