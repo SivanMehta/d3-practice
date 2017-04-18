@@ -78,18 +78,20 @@ function revealCell(cell) {
 
   // color in the cell and remove click handler
   d3.select(this)
-  .style("fill", color)
-  .on('click', null)
+    .style("fill", color)
+    .on('click', null)
+
   // add the appropriate text
   d3.select("#sweep svg").append('text')
-  .attr('x', _ => cell.col * cellWidth + cellWidth * .5)
-  .attr('y', _ => cell.row * cellWidth + cellWidth * .5)
-  .attr('text-anchor', 'middle')
-  .attr('fill', '#000')
-  .text(_ => cell.value)
+    .attr('x', _ => cell.col * cellWidth + cellWidth * .5)
+    .attr('y', _ => cell.row * cellWidth + cellWidth * .5)
+    .attr('text-anchor', 'middle')
+    .attr('fill', '#000')
+    .text(_ => cell.value)
+  
   // update the score
   d3.select("#score")
-  .text(score)
+    .text(score)
 }
 
 // render cells
