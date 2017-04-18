@@ -12,20 +12,6 @@ class Minesweeper {
 
   }
 
-  revealCell(cell) {
-    function getColor(value) {
-      return "rgb(0,"+ (value * 32) + ",0)"
-    }
-
-    console.log(cell)
-
-    var color = cell.value < 0 ? "#f00" : getColor(cell.value)
-    color = cell.value == 0 ? "#fff" : color
-
-    d3.select(this).style("fill", color)
-    d3.select(this).on('click', null)
-  }
-
   render() {
     const cellWidth = (window.innerWidth - 20) / this.width
 
@@ -38,15 +24,24 @@ class Minesweeper {
       .attr('height', cellWidth)
       .style('fill', "#000")
       .style('stroke', '#000')
-      .on('click', this.revealCell)
+      .on('click', function (cell) {
+        console.log(cell)
 
-    this.grid.selectAll('text')
-      .data(this.cells).enter().append('text')
-      .attr('x', c => c.col * cellWidth + cellWidth * .5)
-      .attr('y', c => c.row * cellWidth + cellWidth * .5)
-      .attr('text-anchor', 'middle')
-      .text(c => c.value)
+        var color = cell.value < 0 ? "#f00" : getColor(cell.value)
+        color = cell.value == 0 ? "#fff" : color
 
+        // color in the cell and remove click handler
+        d3.select(this)
+          .style("fill", color)
+          .on('click', null)
+        // add the appropriate text
+        d3.select("#sweep svg").append('text')
+          .attr('x', _ => cell.col * cellWidth + cellWidth * .5)
+          .attr('y', _ => cell.row * cellWidth + cellWidth * .5)
+          .attr('text-anchor', 'middle')
+          .attr('fill', '#000')
+          .text(_ => cell.value)
+      })
   }
 }
 
@@ -96,6 +91,10 @@ function surroundingBombs (cell, i, board) {
   }, 0)
 
   return bombs
+}
+
+function getColor(value) {
+  return "rgb(0,"+ (value * 32) + ",0)"
 }
 
 const bombCounts = game.cells.map(surroundingBombs)
