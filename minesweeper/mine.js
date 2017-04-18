@@ -1,7 +1,7 @@
 // setup grid
 const width = 20
 const height = 10
-const mines = 30
+const mines = score
 
 // populate cell grid
 var cells = Array()
@@ -76,14 +76,18 @@ function revealCell(cell) {
     lose()
   } else {
     color = getColor(cell.value)
-    score += 1
   }
   color = cell.value == 0 ? "#fff" : color
 
-  // color in the cell and remove click handler
+  // color in the cell and remove click handlers
   d3.select(this)
     .style("fill", color)
     .on('click', null)
+    .on('contextmenu', null)
+
+  // remove any flags
+  d3.select('#cell-flag-' + cell.row + '-' + cell.col)
+    .remove()
 
   // add the appropriate text
   d3.select("#sweep svg").append('text')
@@ -93,9 +97,36 @@ function revealCell(cell) {
     .attr('fill', '#000')
     .text(_ => cell.value)
 
-  // update the score
-  d3.select("#score")
-    .text(score)
+}
+
+// update the score
+function toggleFlag(cell) {
+  d3.event.preventDefault()
+
+  // if not flagged, render the bomb icon
+  if(!cell.flagged) {
+    score -= 1
+    d3.select("#sweep svg").append('text')
+      .attr('x', _ => cell.col * cellWidth + cellWidth * .5)
+      .attr('y', _ => cell.row * cellWidth + cellWidth * .5)
+      .attr('text-anchor', 'middle')
+      .attr('fill', '#F00')
+      .attr('id', 'cell-flag-' + cell.row + '-' + cell.col)
+      .text(_ => 'F')
+    cell.flagged = true
+  } else {
+    // otherwise just turn to black
+    d3.select('#cell-flag-' + cell.row + '-' + cell.col)
+      .text(_ => '')
+      .style('fill', '#000')
+      .on('click', revealCell)
+      .on('contextmenu', toggleFlag)
+
+    score += 1
+    cell.flagged = false
+  }
+  d3.select("#score").text(score)
+
 }
 
 // render cells
@@ -109,3 +140,4 @@ grid.selectAll('.cell')
   .style('fill', "#000")
   .style('stroke', '#000')
   .on('click', revealCell)
+  .on('contextmenu', toggleFlag)
