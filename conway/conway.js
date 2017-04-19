@@ -17,10 +17,10 @@ function gridData(rows = 10, cols = 10) {
 }
 
 // populate grid data
-const numRows = 30
-const numCols = 30
-const gridHeight = 900
-const gridWidth = 900
+const numRows = 50
+const numCols = 50
+const gridHeight = 750
+const gridWidth = 750
 const cellWidth = gridWidth / numCols
 const cellHeight = gridHeight / numRows
 var gridCells = gridData(numRows, numCols)
@@ -32,8 +32,8 @@ const dirs = [
   [-1, 1],  [0, 1],  [1, 1],
 ]
 
-function getNeighbors (x, y) {
-  const neighbors =  dirs.reduce((prev, dir) => {
+function getNeighbors (x, y, dataset) {
+  return dirs.reduce((prev, dir) => {
     var isActive = false
     const dx = dir[0]
     const dy = dir[1]
@@ -43,20 +43,17 @@ function getNeighbors (x, y) {
        y + dy < numRows &&
        x + dx < numCols) {
       try {
-        isActive = isActive || gridCells[index].active
+        isActive = isActive || dataset[index].active
       } catch(e) {
         isActive = false
       }
-      // isActive = true
     }
     return prev + isActive
   }, 0)
-  // state[x * numCols + y].neighbors = neighbors
-  return neighbors
 }
 
 gridCells.forEach((cell, i) => {
-  gridCells[i].neighbors = getNeighbors(cell.row, cell.col)
+  gridCells[i].neighbors = getNeighbors(cell.row, cell.col, gridCells)
 })
 
 // initialize grid
@@ -65,39 +62,44 @@ var grid = d3.select("#life")
   .attr("width", (gridWidth + 10) + "px")
   .attr("height", (gridHeight + 10) + "px")
 
-// create each square
-grid.selectAll("rect")
-  .data(gridCells)
-  .enter().append("rect")
-  .attr("class", "square")
-  .attr("x", d => d.posX)
-  .attr("y", d => d.posY)
-  .attr('active', d => d.active)
-  .attr("width", d => d.width)
-  .attr("height", d => d.height)
-  .style("fill", "#fff")
-  .style("stroke-width", 0)
-  .style("stroke", "#000")
+function animate(data) {
+  console.log('here')
+  d3.selectAll('rect').remove()
 
-// fill active squares
-d3.selectAll(".square")
-  .filter((d, i) => d.active)
-  .style("fill", "#888")
+  // create each square
+  grid.selectAll("rect")
+    .data(data)
+    .enter().append("rect")
+    .attr("class", "square")
+    .attr("x", d => d.posX)
+    .attr("y", d => d.posY)
+    .attr('active', d => d.active)
+    .attr("width", d => d.width)
+    .attr("height", d => d.height)
+    .style("fill", "#fff")
+    .style("stroke-width", 0)
+    .style("stroke", "#000")
+    .filter((d, i) => d.active)
+      .style("fill", "#888")
 
-// overlay number of neighbors
-grid.selectAll('text')
-  .data(gridCells)
-  .enter().append('text')
-  .attr("x", d => d.posX + cellWidth*.5)
-  .attr("y", d => d.posY + cellHeight*.5)
-  .attr('text-anchor', 'middle')
-  .text(d => getNeighbors(d.row, d.col))
-
-var generation = 1
-function animate () {
-  console.log(generation ++)
-
-  setTimeout(animate, 1000)
+  async.map(data, (cell, done) => {
+    // update active status based on number of neighbors
+    var updatedCell = Object.assign({}, cell)
+    updatedCell.neighbors = getNeighbors(cell.row, cell.col, data)
+    if(cell.active) {
+      if(cell.neighbors < 2 || cell.neighbors > 3) {
+        updatedCell.active = false
+      }
+    } else {
+      if(cell.neighbors == 3) {
+        updatedCell.active = true
+      }
+    }
+    // update number of neighbors with active surroundings
+    done(null, updatedCell)
+  }, (err, updatedCells) => {
+    setTimeout(animate, 1, updatedCells)
+  })
 }
 
-animate()
+animate(gridCells)
