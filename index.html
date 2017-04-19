@@ -23,7 +23,7 @@
         <div class = 'list-group' id = 'content'>
         </div>
     </div>
-    <script >
+    <script>
       const projects = [
         {
           title: "Conway's Game of Life",
@@ -38,17 +38,22 @@
         }
       ]
 
+      // project links
       var links = d3.select('#content').selectAll('a')
         .data(projects).enter()
         .append('a')
         .attr('href', p => p.link)
         .attr('class', 'list-group-item list-group-item-action flex-column align-items-start')
 
-      // title
-      links.append('h5').text(p => p.title)
+      // headers for each project
+      var headers = links.append('div')
+        .attr('class', 'd-flex w-100 justify-content-between')
 
-      // status
-      links.append('small').text(p => "(" + p.status + ")")
+      // add title to header
+      headers.append('h5').text(p => p.title)
+
+      // add status to header
+      headers.append('small').text(p => "(" + p.status + ")")
 
       // description
       links.append('p').text(p => p.description)
