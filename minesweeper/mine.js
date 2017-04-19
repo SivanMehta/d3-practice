@@ -1,7 +1,7 @@
 // setup grid
 const width = 20
 const height = 10
-const mines = score
+const mines = (30 - score)
 
 // populate cell grid
 var cells = Array()
