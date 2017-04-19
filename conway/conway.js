@@ -19,8 +19,8 @@ function gridData(rows = 10, cols = 10) {
 // populate grid data
 const numRows = 50
 const numCols = 50
-const gridHeight = 750
-const gridWidth = 750
+const gridHeight = 500
+const gridWidth = 500
 const cellWidth = gridWidth / numCols
 const cellHeight = gridHeight / numRows
 var gridCells = gridData(numRows, numCols)
@@ -62,6 +62,14 @@ var grid = d3.select("#life")
   .attr("width", (gridWidth + 10) + "px")
   .attr("height", (gridHeight + 10) + "px")
 
+/*
+ may be you can move the computation to a server than generates the frames
+ ALOT of parallel processing, only to have the frames streamed to the browser?
+
+ That is the fast way of doing, pretty much "pre-rendering" the video
+*/
+
+var generation = 1
 function animate(data) {
   console.log('here')
   d3.selectAll('rect').remove()
@@ -82,10 +90,11 @@ function animate(data) {
     .filter((d, i) => d.active)
       .style("fill", "#888")
 
+  d3.select('#generations').text(Math.floor(generation / 2))
+
   async.map(data, (cell, done) => {
     // update active status based on number of neighbors
     var updatedCell = Object.assign({}, cell)
-    updatedCell.neighbors = getNeighbors(cell.row, cell.col, data)
     if(cell.active) {
       if(cell.neighbors < 2 || cell.neighbors > 3) {
         updatedCell.active = false
@@ -96,8 +105,10 @@ function animate(data) {
       }
     }
     // update number of neighbors with active surroundings
+    updatedCell.neighbors = getNeighbors(cell.row, cell.col, data)
     done(null, updatedCell)
   }, (err, updatedCells) => {
+    generation ++
     setTimeout(animate, 1, updatedCells)
   })
 }
