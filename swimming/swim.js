@@ -47,7 +47,18 @@ function cleanData (d) {
   d.date = parsedDate.setFullYear(d.season + diff + offset)
 }
 
-function renderData(data) {
+// setup events
+var dispatch = d3.dispatch("start", "facet")
+
+d3.request("cmu.csv")
+  .mimeType("text/plain")
+  .response(xhr => psv.parse(xhr.responseText))
+  .get(data => {
+    dispatch.call('start', this, data)
+  })
+
+// rendering the data
+dispatch.on('start', data => {
   // clean data appropriately
   data.forEach(cleanData)
 
@@ -89,16 +100,17 @@ function renderData(data) {
   // render the drop down menu
   var ids = new Set()
   data.map(d => ids.add(d.swimmerID))
-  d3.select("#facet").selectAll("option")
-    .data([...ids])
-    .enter()
+  var facet = d3.select('#facet')
+  facet.selectAll("option")
+    .data([...ids]).enter()
     .append("option")
-    // .enter()
-    .attr('value', (d, i) => d)
-    .text((d, i) => d)
-}
+      .attr('value', (d, i) => d)
+      .text((d, i) => d)
 
-d3.request("cmu.csv")
-  .mimeType("text/plain")
-  .response(xhr => psv.parse(xhr.responseText))
-  .get(renderData)
+  facet.on('change', _ => dispatch.call('facet'))
+})
+
+dispatch.on('facet', _ => {
+  const value = d3.select("#facet").property('value')
+  console.log(value)
+})
