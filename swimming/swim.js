@@ -18,7 +18,16 @@ var svg = d3.select('#graph').append('svg')
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 
 var psv = d3.dsvFormat("|")
-var parseDate = d3.timeParse("%Y-%m-%d")
+
+// because we're seeing everything at once, put everything
+// on the same year
+function parseDate (datum) {
+  var parsedDate = d3.timeParse("%Y-%m-%d")(datum.date)
+  const diff = 2017 - datum.season
+  parsedDate.setFullYear(datum.season + diff)
+
+  return parsedDate
+}
 
 function showToolTip(pt) {
   const left = x(pt.date) < width / 2
@@ -28,7 +37,7 @@ function showToolTip(pt) {
     .attr('y', y(pt.points))
     .attr('text-anchor', left ? 'start' : 'end')
     .attr('class', 'tooltip')
-    .text(pt.time + " - " + pt.event)
+    .text(pt.date + " " + pt.time)
 }
 
 function removeToolTip(pt) {
@@ -36,10 +45,13 @@ function removeToolTip(pt) {
 }
 
 function renderData(data) {
+  // clean data appropriately
   data.forEach(d => {
-    d.date = parseDate(d.date)
     d.points = +d.points
+    d.season = +d.season
+    d.date = parseDate(d)
   })
+
   // Scale the range of the data
   x.domain(d3.extent(data, d => d.date ))
   y.domain([
@@ -47,11 +59,7 @@ function renderData(data) {
     d3.max(data, d => d.points ) * 1.1
   ])
 
-
-  // Define the div for the tooltip
-  var info = d3.select("#info")
-    .append("circle")
-
+  // render all the dots
   svg.selectAll("dot")
     .data(data).enter()
     .append("circle")
