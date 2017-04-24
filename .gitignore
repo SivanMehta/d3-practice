@@ -1,3 +1,4 @@
 yarn.lock
 **/node_modules/
 *.log
+swimming/data.csv
