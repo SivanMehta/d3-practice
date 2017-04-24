@@ -20,12 +20,26 @@ var svg = d3.select('#graph').append('svg')
 var psv = d3.dsvFormat("|")
 var parseDate = d3.timeParse("%Y-%m-%d")
 
+function showToolTip(pt) {
+  const left = x(pt.date) < width / 2
+  svg.append('text')
+    .text(_ => pt.swimmerID)
+    .attr('x', x(pt.date) + (left ? -10 : 10))
+    .attr('y', y(pt.points))
+    .attr('text-anchor', left ? 'start' : 'end')
+    .attr('class', 'tooltip')
+    .text(pt.time + " - " + pt.event)
+}
+
+function removeToolTip(pt) {
+  svg.select('.tooltip').remove()
+}
+
 function renderData(data) {
   data.forEach(d => {
     d.date = parseDate(d.date)
     d.points = +d.points
   })
-
   // Scale the range of the data
   x.domain(d3.extent(data, d => d.date ))
   y.domain([
@@ -33,25 +47,32 @@ function renderData(data) {
     d3.max(data, d => d.points ) * 1.1
   ])
 
+
+  // Define the div for the tooltip
+  var info = d3.select("#info")
+    .append("circle")
+
   svg.selectAll("dot")
     .data(data).enter()
     .append("circle")
     .filter(d => !isNaN(d.points))
-    .attr("r", 3.5)
+    .attr("r", 5)
     .attr("cx", d => x(d.date))
     .attr("cy", d => y(d.points))
     .attr('fill', '#BDBDBD')
+    .on("mouseover", showToolTip)
+    .on("mouseout", removeToolTip);
 
   // Add the X Axis
   svg.append("g")
     .attr("class", "x axis")
     .attr("transform", "translate(0," + height + ")")
-    .call(xAxis);
+    .call(xAxis)
 
   // Add the Y Axis
   svg.append("g")
     .attr("class", "y axis")
-    .call(yAxis);
+    .call(yAxis)
 }
 
 d3.request("/data.csv")
