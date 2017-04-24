@@ -35,6 +35,11 @@
           link: 'minesweeper/sweep.html',
           status: 'In Progress',
           description: "An implementation of minesweeper. I aim to make the entire gameplay eventually but for now it looks pretty crap, as it doesn't do anything other than reveal the cell's value."
+        }, {
+          title: 'Swimming',
+          link: 'swimming/graph.html',
+          status: 'In Progress',
+          description: "Hopefully, this can serve to supplant <a href = 'https://sivanmehta.github.io/swimming/'>this</a> in visualizing every swim for the past 4 years for CMU's varsity Swimming and Diving"
         }
       ]
 
@@ -43,7 +48,7 @@
         .data(projects).enter()
         .append('a')
         .attr('href', p => p.link)
-        .attr('class', 'list-group-item list-group-item-action flex-column align-items-start')
+        .attr('class', 'list-group-item list-group-item-action')
 
       // headers for each project
       var headers = links.append('div')
@@ -56,7 +61,7 @@
       headers.append('small').text(p => "(" + p.status + ")")
 
       // description
-      links.append('p').text(p => p.description)
+      links.append('p').html(p => p.description)
         .attr('class', 'mb-1')
     </script>
   </body>
