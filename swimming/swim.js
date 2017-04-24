@@ -27,7 +27,8 @@ function showToolTip(pt) {
     .attr('y', y(pt.points))
     .attr('text-anchor', left ? 'start' : 'end')
     .attr('class', 'tooltip')
-    .text(pt.swimmerID + " " + pt.time + " " + pt.event)
+    .style('z-index', '-1')
+    .text(pt.time + " " + pt.event)
 }
 
 function removeToolTip(pt) {
@@ -70,7 +71,7 @@ dispatch.on('start', data => {
     xRange[1] + 1000 * 60 * 60 * 24 * 10
   ])
   y.domain([
-    d3.min(data, d => d.points ) * .9,
+    300, // d3.min(data, d => d.points ) * .9,
     d3.max(data, d => d.points ) * 1.1
   ])
 
@@ -85,6 +86,7 @@ dispatch.on('start', data => {
     .attr('fill', '#BDBDBD')
     .attr('opacity', '.3')
     .attr('swimmer', d => d.swimmerID)
+    .style('z-index', '0')
     .on("mouseover", showToolTip)
     .on("mouseout", removeToolTip);
 
@@ -117,15 +119,23 @@ dispatch.on('start', data => {
 dispatch.on('facet', _ => {
   const value = d3.select("#facet").property('value')
   if(value > 0) {
+    // make desired swims more visible
     svg.selectAll("circle[swimmer = '" + value + "']")
       .attr('fill', '#FF0000')
       .attr('opacity', '1')
+      .on("mouseover", showToolTip)
+
+    // diminish undesired swims
     svg.selectAll("circle:not([swimmer = '" + value + "'])")
       .attr('opacity', '.1')
       .attr('fill', '#BDBDBD')
+      .on("mouseover", null)
+
   } else {
+    // reset to default otherwise
     svg.selectAll('circle')
       .attr('opacity', '.3')
       .attr('fill', '#BDBDBD')
+      .on("mouseover", showToolTip)
   }
 })
