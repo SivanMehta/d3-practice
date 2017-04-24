@@ -19,16 +19,6 @@ var svg = d3.select('#graph').append('svg')
 
 var psv = d3.dsvFormat("|")
 
-// because we're seeing everything at once, put everything
-// on the same year
-function parseDate (datum) {
-  var parsedDate = d3.timeParse("%Y-%m-%d")(datum.date)
-  const diff = 2017 - datum.season
-  parsedDate.setFullYear(datum.season + diff)
-
-  return parsedDate
-}
-
 function showToolTip(pt) {
   const left = x(pt.date) < width / 2
   svg.append('text')
@@ -37,23 +27,37 @@ function showToolTip(pt) {
     .attr('y', y(pt.points))
     .attr('text-anchor', left ? 'start' : 'end')
     .attr('class', 'tooltip')
-    .text(pt.date + " " + pt.time)
+    .text(pt.swimmerID + " " + pt.time + " " + pt.event)
 }
 
 function removeToolTip(pt) {
   svg.select('.tooltip').remove()
 }
 
+function cleanData (d) {
+  // convert to numbers
+  d.points = +d.points
+  d.season = +d.season
+
+  // because we're seeing everything at once, put everything
+  // on the same year
+  var parsedDate = d3.timeParse("%Y-%m-%d")(d.date)
+  const diff = 2016 - d.season
+  const offset = parsedDate.getMonth() < 5 ? 1 : 0
+  d.date = parsedDate.setFullYear(d.season + diff + offset)
+}
+
 function renderData(data) {
   // clean data appropriately
-  data.forEach(d => {
-    d.points = +d.points
-    d.season = +d.season
-    d.date = parseDate(d)
-  })
+  data.forEach(cleanData)
 
   // Scale the range of the data
-  x.domain(d3.extent(data, d => d.date ))
+  var xRange = d3.extent(data, d => d.date)
+  x.domain([
+    // use "10 days" worth of padding
+    xRange[0] - 1000 * 60 * 60 * 24 * 10,
+    xRange[1] + 1000 * 60 * 60 * 24 * 10
+  ])
   y.domain([
     d3.min(data, d => d.points ) * .9,
     d3.max(data, d => d.points ) * 1.1
