@@ -1,4 +1,4 @@
-const margin = {top: 20, right: 20, bottom: 30, left: 40}
+const margin = {top: 20, right: 20, bottom: 60, left: 40}
 const width = window.innerWidth - margin.left - margin.right
 const height = window.innerHeight - margin.top - margin.bottom
 
@@ -83,6 +83,8 @@ dispatch.on('start', data => {
     .attr("cx", d => x(d.date))
     .attr("cy", d => y(d.points))
     .attr('fill', '#BDBDBD')
+    .attr('opacity', '.3')
+    .attr('swimmer', d => d.swimmerID)
     .on("mouseover", showToolTip)
     .on("mouseout", removeToolTip);
 
@@ -100,6 +102,7 @@ dispatch.on('start', data => {
   // render the drop down menu
   var ids = new Set()
   data.map(d => ids.add(d.swimmerID))
+  ids = [...ids].sort()
   var facet = d3.select('#facet')
   facet.selectAll("option")
     .data([...ids]).enter()
@@ -110,7 +113,19 @@ dispatch.on('start', data => {
   facet.on('change', _ => dispatch.call('facet'))
 })
 
+// highlight specific swimmers
 dispatch.on('facet', _ => {
   const value = d3.select("#facet").property('value')
-  console.log(value)
+  if(value > 0) {
+    svg.selectAll("circle[swimmer = '" + value + "']")
+      .attr('fill', '#FF0000')
+      .attr('opacity', '1')
+    svg.selectAll("circle:not([swimmer = '" + value + "'])")
+      .attr('opacity', '.1')
+      .attr('fill', '#BDBDBD')
+  } else {
+    svg.selectAll('circle')
+      .attr('opacity', '.3')
+      .attr('fill', '#BDBDBD')
+  }
 })
