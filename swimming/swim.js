@@ -75,7 +75,7 @@ function renderData(data) {
     .call(yAxis)
 }
 
-d3.request("/data.csv")
+d3.request("cmu.csv")
   .mimeType("text/plain")
   .response(xhr => psv.parse(xhr.responseText))
   .get(renderData)
