@@ -85,6 +85,17 @@ function renderData(data) {
   svg.append("g")
     .attr("class", "y axis")
     .call(yAxis)
+
+  // render the drop down menu
+  var ids = new Set()
+  data.map(d => ids.add(d.swimmerID))
+  d3.select("#facet").selectAll("option")
+    .data([...ids])
+    .enter()
+    .append("option")
+    // .enter()
+    .attr('value', (d, i) => d)
+    .text((d, i) => d)
 }
 
 d3.request("cmu.csv")
