@@ -8,6 +8,6 @@
   },
   "scripts": {
     "scrape": "node scrape.js > data.csv",
-    "start": "http-server &"
+    "start": "http-server"
   }
 }

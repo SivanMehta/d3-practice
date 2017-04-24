@@ -16,7 +16,7 @@ function toSeconds(time) {
 function toPowerPoints(event, time, gender) {
   const seconds = toSeconds(time)
   const standard = toSeconds(standards[gender][event])
-  const points = Math.pow(1000 * (standard / seconds), 3)
+  const points = 1000 * Math.pow((standard / seconds), 3)
   return isNaN(points) ? "NA" : Math.round(points)
 }
 
