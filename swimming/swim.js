@@ -121,25 +121,28 @@ function change() {
   if(value > 0) {
     // make desired swims more visible
     svg.selectAll("circle[swimmer = '" + value + "']")
-      .attr('fill', '#FF0000')
-      .attr('opacity', '1')
       .on("mouseover", showToolTip)
       .each(function() {
         this.parentNode.appendChild(this)
       })
+      .transition(1000)
+      .style("fill", "#FF0000")
+      .style('opacity', '1')
 
     // diminish undesired swims
     svg.selectAll("circle:not([swimmer = '" + value + "'])")
-      .attr('opacity', '.1')
-      .attr('fill', '#BDBDBD')
       .on("mouseover", null)
+      .transition(1000)
+      .style("fill", "#BDBDBD")
+      .style('opacity', '.1')
 
   } else {
     // reset to default otherwise
     svg.selectAll('circle')
-      .attr('opacity', '.3')
-      .attr('fill', '#BDBDBD')
       .on("mouseover", showToolTip)
+      .transition(1000)
+      .style("fill", "#BDBDBD")
+      .style('opacity', '.3')
   }
 }
 
