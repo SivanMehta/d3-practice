@@ -21,7 +21,7 @@ var psv = d3.dsvFormat("|")
 
 function showToolTip(pt) {
   const left = x(pt.date) < width / 2
-  svg.append('text')
+  svg.append("text")
     .text(_ => pt.swimmerID)
     .attr('x', x(pt.date) + (left ? -10 : 10))
     .attr('y', y(pt.points))
@@ -55,11 +55,11 @@ d3.request("cmu.csv")
   .mimeType("text/plain")
   .response(xhr => psv.parse(xhr.responseText))
   .get(data => {
-    dispatch.call('start', this, data)
+    start(data)
   })
 
 // rendering the data
-dispatch.on('start', data => {
+function start(data) {
   // clean data appropriately
   data.forEach(cleanData)
 
@@ -112,11 +112,11 @@ dispatch.on('start', data => {
       .attr('value', (d, i) => d)
       .text((d, i) => d)
 
-  facet.on('change', _ => dispatch.call('facet'))
-})
+  facet.on('change', change)
+}
 
 // highlight specific swimmers
-dispatch.on('facet', _ => {
+function change() {
   const value = d3.select("#facet").property('value')
   if(value > 0) {
     // make desired swims more visible
@@ -124,6 +124,9 @@ dispatch.on('facet', _ => {
       .attr('fill', '#FF0000')
       .attr('opacity', '1')
       .on("mouseover", showToolTip)
+      .each(function() {
+        this.parentNode.appendChild(this)
+      })
 
     // diminish undesired swims
     svg.selectAll("circle:not([swimmer = '" + value + "'])")
@@ -138,4 +141,70 @@ dispatch.on('facet', _ => {
       .attr('fill', '#BDBDBD')
       .on("mouseover", showToolTip)
   }
-})
+}
+
+results = [
+  {
+    "name": "John Winston",
+    "url": "/swimmer/209958",
+    "photo": null,
+    "source": "Swimmers",
+    "text": "John Winston\n \n",
+    "location": "USA",
+    "team": "Darton College",
+    "name_auto": "John Winston\n \n",
+    "id": "sdif.swimmer.209958"
+  }, {
+    "name": "Winston Stagg",
+    "url": "/swimmer/15667",
+    "photo": null,
+    "source": "Swimmers",
+    "text": "Winston Stagg\n \n",
+    "location": "USA",
+    "team": "Washington and Lee University",
+    "name_auto": "Winston Stagg\n \n",
+    "id": "sdif.swimmer.15667"
+  }, {
+    "name": "Winston Chu",
+    "url": "/swimmer/136972",
+    "photo": null,
+    "source": "Swimmers",
+    "text": "Winston Chu\nFL Florida\nGainesville",
+    "location": "Gainesville, FL",
+    "team": "Eastside High School",
+    "name_auto": "Winston Chu\nFL Florida\nGainesville",
+    "id": "sdif.swimmer.136972"
+  }
+]
+
+var delayTimer
+function doSearch() {
+    clearTimeout(delayTimer)
+    delayTimer = setTimeout(_ => search(query.value), 1000)
+
+    return false
+}
+
+function search(query) {
+  // fetch("https://www.collegeswimming.com/api/search/?q=" + query, {
+  //     // mode: 'no-cors',
+  //     credentials: 'include',
+  //     headers: {
+  //       'Access-Control-Allow-Origin':'*',
+  //       Referer: 'https://www.collegeswimming.com/',
+  //       Accept: '*/*',
+  //       Host: 'www.collegeswimming.com',
+  //       'X-Requested-With': 'XMLHttpRequest'
+  //     }
+  //   })
+  //   .then(data => {
+  //     console.log(data)
+  //   })
+  // d3.select("#query-results").selectAll('li')
+  //   .data(results).enter()
+  //   .append('li')
+  //   .text(d => d.name + " - " + (d.id.split('.')[2]))
+  //   .attr('class', 'list-group-item')
+
+  console.log(query)
+}
