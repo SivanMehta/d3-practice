@@ -48,9 +48,6 @@ function cleanData (d) {
   d.date = parsedDate.setFullYear(d.season + diff + offset)
 }
 
-// setup events
-var dispatch = d3.dispatch("start", "facet")
-
 d3.request("cmu.csv")
   .mimeType("text/plain")
   .response(xhr => psv.parse(xhr.responseText))
