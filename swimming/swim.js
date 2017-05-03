@@ -136,6 +136,8 @@ function change() {
       .style("fill", "#BDBDBD")
       .style('opacity', '.1')
 
+    window.document.title = "Highlighting " + value
+
   } else {
     // reset to default otherwise
     svg.selectAll('circle')
@@ -143,6 +145,8 @@ function change() {
       .transition(1000)
       .style("fill", "#BDBDBD")
       .style('opacity', '.3')
+
+    window.document.title = "Swim Graphs"
   }
 }
 
