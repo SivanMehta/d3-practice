@@ -1,7 +1,8 @@
 // setup grid
 const width = 20
 const height = 10
-const mines = (30 - score)
+score = parseInt(score.innerHTML)
+const mines = score
 
 // populate cell grid
 var cells = Array()
@@ -62,23 +63,19 @@ var grid = d3.select("#sweep")
   .attr("class", "minesweeper")
 const cellWidth = (window.innerWidth - 20) / width
 
-function lose (cell) {
-  d3.select("#sweep").remove()
+function lose () {
+  alert(`You died with ${score} mines left`)
+  location.reload()
 }
 
 function revealCell(cell) {
   console.log(cell)
 
-  var color;
   if(cell.value < 0) {
-    color = "#f00"
-    alert("You suck!")
-    lose()
-  } else {
-    color = getColor(cell.value)
+    return lose()
   }
-  color = cell.value == 0 ? "#fff" : color
 
+  var color = cell.value == 0 ? "#fff" : getColor(cell.value)
   // color in the cell and remove click handlers
   d3.select(this)
     .style("fill", color)
@@ -96,7 +93,6 @@ function revealCell(cell) {
     .attr('text-anchor', 'middle')
     .attr('fill', '#000')
     .text(_ => cell.value)
-
 }
 
 // update the score
@@ -116,14 +112,14 @@ function toggleFlag(cell) {
 
     cell.flagged = true
   } else {
-    // otherwise just remove the flaf
+    // otherwise just remove the flag
     d3.select('#cell-flag-' + cell.row + '-' + cell.col).remove()
 
     score += 1
     cell.flagged = false
   }
-  d3.select("#score").text(score)
 
+  d3.select("#score").text(score)
 }
 
 // render cells
