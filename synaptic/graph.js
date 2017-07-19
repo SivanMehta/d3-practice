@@ -30,6 +30,8 @@ var y = d3.scaleLinear()
   .domain([.5, 2])
   .range([height, 0])
 
+var color = (col) => col == 'upper' ? '#f00' : '#0f0'
+
 var yAxis = d3.axisLeft(y).ticks(5)
 var xAxis = d3.axisBottom(x).ticks(5)
 
@@ -38,15 +40,6 @@ var svg = d3.select('#graph').append('svg')
   .attr('height', height + margin.top + margin.bottom)
   .append('g')
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
-
-var tooltip = svg.append("g")
-  .attr("class", "tooltip")
-
-tooltip.append('text')
-  .attr('x', x(2))
-  .attr('y', y(1.8))
-  .text('Current selection:')
-
 d3.csv("./boomerang.csv", (err, data) => {
   data.forEach(row => {
     row.x = +row.x
@@ -61,7 +54,7 @@ d3.csv("./boomerang.csv", (err, data) => {
     .attr('r', 5)
     .attr('cx', d => x(d.x))
     .attr('cy', d => y(d.y))
-    .attr('fill', d => d.label == 'upper' ? '#f00' : '#0f0')
+    .attr('fill', d => color(d.label))
     .on("mouseover", showTooltip)
 
   // Add the axes
@@ -76,17 +69,26 @@ d3.csv("./boomerang.csv", (err, data) => {
 
 })
 
-
 function showTooltip(pt) {
   svg.select('.tooltip').remove()
+  svg.select('.highlight').remove()
+
   svg.append("text")
     .attr('x', x(2))
     .attr('y', y(1.8))
     .attr('class', 'tooltip')
-    .style('z-index', '-1')
+    .attr('fill', color(pt.label))
     .text(
       "Current selection: " +
       pt.x.toPrecision(3) + ", " +
       pt.y.toPrecision(3)
     )
+
+  svg.append('circle')
+    .attr('cx', x(pt.x))
+    .attr('cy', y(pt.y))
+    .attr('r', 5)
+    .attr('stroke',  '#000')
+    .attr('fill', "none")
+    .attr('class', 'highlight')
 }
