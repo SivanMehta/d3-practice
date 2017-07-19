@@ -39,6 +39,14 @@ var svg = d3.select('#graph').append('svg')
   .append('g')
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 
+var tooltip = svg.append("g")
+  .attr("class", "tooltip")
+
+tooltip.append('text')
+  .attr('x', x(2))
+  .attr('y', y(1.8))
+  .text('Current selection:')
+
 d3.csv("./boomerang.csv", (err, data) => {
   data.forEach(row => {
     row.x = +row.x
@@ -54,6 +62,7 @@ d3.csv("./boomerang.csv", (err, data) => {
     .attr('cx', d => x(d.x))
     .attr('cy', d => y(d.y))
     .attr('fill', d => d.label == 'upper' ? '#f00' : '#0f0')
+    .on("mouseover", showTooltip)
 
   // Add the axes
   svg.append("g")
@@ -64,4 +73,20 @@ d3.csv("./boomerang.csv", (err, data) => {
   svg.append("g")
     .attr("class", "y axis")
     .call(yAxis)
+
 })
+
+
+function showTooltip(pt) {
+  svg.select('.tooltip').remove()
+  svg.append("text")
+    .attr('x', x(2))
+    .attr('y', y(1.8))
+    .attr('class', 'tooltip')
+    .style('z-index', '-1')
+    .text(
+      "Current selection: " +
+      pt.x.toPrecision(3) + ", " +
+      pt.y.toPrecision(3)
+    )
+}
