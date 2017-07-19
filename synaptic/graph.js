@@ -55,18 +55,13 @@ d3.csv("./boomerang.csv", (err, data) => {
     .attr('cy', d => y(d.y))
     .attr('fill', d => d.label == 'upper' ? '#f00' : '#0f0')
 
-    // Add the X Axis
-    svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis)
+  // Add the axes
+  svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis)
 
-    // Add the Y Axis
-    svg.append("g")
-      .attr("class", "y axis")
-      .call(yAxis)
+  svg.append("g")
+    .attr("class", "y axis")
+    .call(yAxis)
 })
-
-function renderPoints(data) {
-  console.log(data)
-}
