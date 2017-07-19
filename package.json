@@ -7,7 +7,7 @@
     "request": "^2.81.0"
   },
   "scripts": {
-    "scrape": "node scrape.js > data.csv",
+    "swim-scrape": "node swimming/scrape.js > swimming/data.csv",
     "start": "http-server"
   }
 }
