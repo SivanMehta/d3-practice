@@ -1,3 +1,23 @@
+// Neural Net
+
+var inputLayer = new synaptic.Layer(2)
+var hiddenLayer = new synaptic.Layer(6)
+var outputLayer = new synaptic.Layer(1)
+
+inputLayer.project(hiddenLayer)
+hiddenLayer.project(outputLayer)
+
+var nn = new synaptic.Network({
+	input: inputLayer,
+	hidden: [hiddenLayer],
+	output: outputLayer
+})
+
+// training the network on XOR
+const learningRate = .3
+
+// Graphing
+
 const margin = {top: 20, right: 20, bottom: 60, left: 40}
 const width = window.innerWidth - margin.left - margin.right
 const height = window.innerHeight - margin.top - margin.bottom
@@ -23,7 +43,8 @@ d3.csv("./boomerang.csv", (err, data) => {
   data.forEach(row => {
     row.x = +row.x
     row.y = +row.y
-    console.log(row);
+    nn.activate([0,1])
+    nn.propagate(learningRate, [row.label])
   })
 
   svg.selectAll('dot')
