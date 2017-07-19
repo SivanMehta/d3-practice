@@ -13,9 +13,6 @@ var nn = new synaptic.Network({
 	output: outputLayer
 })
 
-// training the network on XOR
-const learningRate = .3
-
 // Graphing
 
 const margin = {top: 20, right: 20, bottom: 60, left: 40}
@@ -42,16 +39,21 @@ var svg = d3.select('#graph').append('svg')
   .append('g')
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 
-d3.csv("./boomerang.csv", (err, data) => {
-  data.forEach(row => {
-    row.x = +row.x
-    row.y = +row.y
-    row.label = label(row.label)
-    console.log(row);
+var iteration = 0
+function train(data) {
+  async.each(data, (row, done) => {
+    var learningRate = .01/(1+.0005*iteration);
     nn.activate([row.x, row.y])
     nn.propagate(learningRate, [row.label])
+    iteration++
+    done()
+  }, (err) => {
+    setTimeout(() => renderBoundary(data), 1000)
   })
+}
 
+function renderBoundary(data) {
+  d3.selectAll('rect').remove()
   var w_tiles = Math.round(width / 10)
   var h_tiles = Math.round(height / 10)
   for(var row = 0; row < w_tiles; row ++) {
@@ -63,31 +65,14 @@ d3.csv("./boomerang.csv", (err, data) => {
         .attr('y', col * 10)
         .attr("width", 10)
         .attr("height", 10)
-        .attr('fill', '#111')
+        .attr('fill', '#000')
+        .attr('class', 'boundary')
         .style('fill-opacity', nn.activate([x(cx), y(cy)])[0] )
     }
   }
 
-  svg.selectAll('dot')
-    .data(data).enter()
-    .append('circle')
-    .attr('r', 5)
-    .attr('cx', d => x(d.x))
-    .attr('cy', d => y(d.y))
-    .attr('fill', d => color(d.label))
-    .on("mouseover", showTooltip)
-
-  // Add the axes
-  svg.append("g")
-    .attr("class", "x axis")
-    .attr("transform", "translate(0," + height + ")")
-    .call(xAxis)
-
-  svg.append("g")
-    .attr("class", "y axis")
-    .call(yAxis)
-
-})
+  train(data)
+}
 
 function showTooltip(pt) {
   svg.select('.tooltip').remove()
@@ -112,3 +97,33 @@ function showTooltip(pt) {
     .attr('fill', "none")
     .attr('class', 'highlight')
 }
+
+
+d3.csv("./boomerang.csv", (err, data) => {
+  data.forEach(row => {
+    row.x = +row.x
+    row.y = +row.y
+    row.label = label(row.label)
+  })
+
+  svg.selectAll('dot')
+    .data(data).enter()
+    .append('circle')
+    .attr('r', 5)
+    .attr('cx', d => x(d.x))
+    .attr('cy', d => y(d.y))
+    .attr('fill', d => color(d.label))
+    .on("mouseover", showTooltip)
+
+  // Add the axes
+  svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis)
+
+  svg.append("g")
+    .attr("class", "y axis")
+    .call(yAxis)
+
+  train(data)
+})
