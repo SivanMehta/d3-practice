@@ -3,11 +3,11 @@ const width = window.innerWidth - margin.left - margin.right
 const height = window.innerHeight - margin.top - margin.bottom
 
 var x = d3.scaleLinear()
-  .domain([-1,3.2])
+  .domain([0, 2.75])
   .range([0, width])
 
 var y = d3.scaleLinear()
-  .domain([-1,1.5])
+  .domain([.5, 2])
   .range([height, 0])
 
 var yAxis = d3.axisLeft(y).ticks(5)
@@ -23,7 +23,6 @@ d3.csv("./boomerang.csv", (err, data) => {
   data.forEach(row => {
     row.x = +row.x
     row.y = +row.y
-    row.label = +row.label
     console.log(row);
   })
 
@@ -33,7 +32,7 @@ d3.csv("./boomerang.csv", (err, data) => {
     .attr('r', 5)
     .attr('cx', d => x(d.x))
     .attr('cy', d => y(d.y))
-    .attr('fill', d => d.label == 1 ? '#f00' : '#0f0')
+    .attr('fill', d => d.label == 'upper' ? '#f00' : '#0f0')
 
     // Add the X Axis
     svg.append("g")
