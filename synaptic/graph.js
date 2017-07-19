@@ -30,7 +30,8 @@ var y = d3.scaleLinear()
   .domain([.5, 2])
   .range([height, 0])
 
-var color = (col) => col == 'upper' ? '#f00' : '#0f0'
+var color = (col) => col == 1 ? '#f00' : '#0f0'
+var label = (col) => col == 'upper' ? 1 : 0
 
 var yAxis = d3.axisLeft(y).ticks(5)
 var xAxis = d3.axisBottom(x).ticks(5)
@@ -40,13 +41,32 @@ var svg = d3.select('#graph').append('svg')
   .attr('height', height + margin.top + margin.bottom)
   .append('g')
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+
 d3.csv("./boomerang.csv", (err, data) => {
   data.forEach(row => {
     row.x = +row.x
     row.y = +row.y
-    nn.activate([0,1])
+    row.label = label(row.label)
+    console.log(row);
+    nn.activate([row.x, row.y])
     nn.propagate(learningRate, [row.label])
   })
+
+  var w_tiles = Math.round(width / 10)
+  var h_tiles = Math.round(height / 10)
+  for(var row = 0; row < w_tiles; row ++) {
+    for(var col = 0; col < h_tiles; col ++) {
+      const cx = row * 10 + 5
+      const cy = col * 10 + 5
+      svg.append('rect')
+        .attr('x', row * 10)
+        .attr('y', col * 10)
+        .attr("width", 10)
+        .attr("height", 10)
+        .attr('fill', '#111')
+        .style('fill-opacity', nn.activate([x(cx), y(cy)])[0] )
+    }
+  }
 
   svg.selectAll('dot')
     .data(data).enter()
