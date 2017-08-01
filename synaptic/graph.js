@@ -2,7 +2,7 @@
 
 var inputLayer = new synaptic.Layer(2)
 var hiddenLayer = new synaptic.Layer(6)
-var outputLayer = new synaptic.Layer(1)
+var outputLayer = new synaptic.Layer(2)
 
 inputLayer.project(hiddenLayer)
 hiddenLayer.project(outputLayer)
@@ -27,8 +27,8 @@ var y = d3.scaleLinear()
   .domain([.5, 2])
   .range([height, 0])
 
-var color = (col) => col == 1 ? '#f00' : '#0f0'
-var label = (col) => col == 'upper' ? 1 : 0
+var color = (col) => col[0] == 1 ? '#f00' : '#0f0'
+var label = (col) => col == 'upper' ? [0, 1] : [1, 0]
 
 var yAxis = d3.axisLeft(y).ticks(5)
 var xAxis = d3.axisBottom(x).ticks(5)
@@ -36,6 +36,7 @@ var xAxis = d3.axisBottom(x).ticks(5)
 var svg = d3.select('#graph').append('svg')
   .attr('width', width + margin.left + margin.right)
   .attr('height', height + margin.top + margin.bottom)
+  .style('position', 'absoloute')
   .append('g')
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 
@@ -44,11 +45,11 @@ function train(data) {
   async.each(data, (row, done) => {
     var learningRate = .01/(1+.0005*iteration);
     nn.activate([row.x, row.y])
-    nn.propagate(learningRate, [row.label])
+    nn.propagate(learningRate, row.label)
     iteration++
     done()
   }, (err) => {
-    setTimeout(() => renderBoundary(data), 1000)
+    console.log('trained on all data points!')
   })
 }
 
@@ -98,6 +99,11 @@ function showTooltip(pt) {
     .attr('class', 'highlight')
 }
 
+function guessPoint() {
+  d3.event.stopPropagation();
+  const coords = d3.mouse(this)
+  console.log(nn.activate(coords))
+}
 
 d3.csv("./boomerang.csv", (err, data) => {
   data.forEach(row => {
@@ -113,7 +119,7 @@ d3.csv("./boomerang.csv", (err, data) => {
     .attr('cx', d => x(d.x))
     .attr('cy', d => y(d.y))
     .attr('fill', d => color(d.label))
-    .on("mouseover", showTooltip)
+    .on('mouseover', showTooltip)
 
   // Add the axes
   svg.append("g")
@@ -124,6 +130,8 @@ d3.csv("./boomerang.csv", (err, data) => {
   svg.append("g")
     .attr("class", "y axis")
     .call(yAxis)
+
+  d3.select('#graph').on('click', guessPoint)
 
   train(data)
 })
