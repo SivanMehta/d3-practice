@@ -81,7 +81,7 @@ d3.csv("./boomerang.csv", (err, data) => {
   svg.selectAll('dot')
     .data(data).enter()
     .append('circle')
-    .attr('r', 3)
+    .attr('r', 4)
     .attr('cx', d => x(d.x))
     .attr('cy', d => y(d.y))
     .attr('fill', d => color(d.label))

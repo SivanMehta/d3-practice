@@ -43,10 +43,10 @@
         }, {
           title: 'Voronoi',
           link: 'voronoi/plot.html',
-          status: 'In Progress',
-          description: 'Some basic ML work'
+          status: 'Complete',
+          description: 'Trying to implement a voronoi diagram on top of some data. Ideally it serves as a visualization of nearest neighbors'
         }
-      ]
+      ].sort((a, b) => a.status > b.status)
 
       // project links
       var links = d3.select('#content').selectAll('a')
