@@ -1,17 +1,26 @@
 // Neural Net
 
-var inputLayer = new synaptic.Layer(2)
-var hiddenLayer = new synaptic.Layer(6)
-var outputLayer = new synaptic.Layer(2)
+var layer_defs = [];
+layer_defs.push({type:'input', out_sx:1, out_sy:1, out_depth:2});
+layer_defs.push({type:'fc', num_neurons:6, activation: 'tanh'});
+layer_defs.push({type:'fc', num_neurons:2, activation: 'tanh'});
+layer_defs.push({type:'softmax', num_classes:2});
 
-inputLayer.project(hiddenLayer)
-hiddenLayer.project(outputLayer)
+var net = new convnetjs.Net();
+net.makeLayers(layer_defs);
 
-var nn = new synaptic.Network({
-	input: inputLayer,
-	hidden: [hiddenLayer],
-	output: outputLayer
-})
+var trainer = new convnetjs.SGDTrainer(net, {learning_rate:0.01, momentum:0.1, batch_size:10, l2_decay:0.001});
+
+var iteration = 0
+function train(data) {
+  var x = new convnetjs.Vol(1,1,2);
+  data.forEach(row => {
+    x.w = [row.x, row.y]
+    trainer.train(x, row.label)
+  })
+
+  console.log("Generation " + ++iteration)
+}
 
 // Graphing
 
@@ -27,8 +36,8 @@ var y = d3.scaleLinear()
   .domain([.5, 2])
   .range([height, 0])
 
-var color = (col) => col[0] == 1 ? '#f00' : '#0f0'
-var label = (col) => col == 'upper' ? [0, 1] : [1, 0]
+var color = (col) => col == 1 ? '#f00' : '#0f0'
+var label = (col) => col == 'upper' ? 1 : 0
 
 var yAxis = d3.axisLeft(y).ticks(5)
 var xAxis = d3.axisBottom(x).ticks(5)
@@ -39,41 +48,6 @@ var svg = d3.select('#graph').append('svg')
   .style('position', 'absoloute')
   .append('g')
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
-
-var iteration = 0
-function train(data) {
-  async.each(data, (row, done) => {
-    var learningRate = .01/(1+.0005*iteration);
-    nn.activate([row.x, row.y])
-    nn.propagate(learningRate, row.label)
-    iteration++
-    done()
-  }, (err) => {
-    console.log('trained on all data points!')
-  })
-}
-
-function renderBoundary(data) {
-  d3.selectAll('rect').remove()
-  var w_tiles = Math.round(width / 10)
-  var h_tiles = Math.round(height / 10)
-  for(var row = 0; row < w_tiles; row ++) {
-    for(var col = 0; col < h_tiles; col ++) {
-      const cx = row * 10 + 5
-      const cy = col * 10 + 5
-      svg.append('rect')
-        .attr('x', row * 10)
-        .attr('y', col * 10)
-        .attr("width", 10)
-        .attr("height", 10)
-        .attr('fill', '#000')
-        .attr('class', 'boundary')
-        .style('fill-opacity', nn.activate([x(cx), y(cy)])[0] )
-    }
-  }
-
-  train(data)
-}
 
 function showTooltip(pt) {
   svg.select('.tooltip').remove()
@@ -101,8 +75,12 @@ function showTooltip(pt) {
 
 function guessPoint() {
   d3.event.stopPropagation();
-  const coords = d3.mouse(this)
-  console.log(nn.activate(coords))
+  var coords = d3.mouse(this)
+  coords = [x.invert(coords[0]), y.invert(coords[1])]
+  const guess = new convnetjs.Vol(coords)
+
+  var probability_volume = net.forward(guess);
+  console.log(probability_volume.w);
 }
 
 d3.csv("./boomerang.csv", (err, data) => {
@@ -133,5 +111,5 @@ d3.csv("./boomerang.csv", (err, data) => {
 
   d3.select('#graph').on('click', guessPoint)
 
-  train(data)
+  setInterval(train, 1000, data)
 })
