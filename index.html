@@ -41,12 +41,12 @@
           status: 'In Progress',
           description: "Hopefully, this can serve to supplant <a href = 'https://sivanmehta.github.io/swimming/'>this</a> in visualizing every swim for the past 4 years for CMU's varsity Swimming and Diving"
         }, {
-          title: 'Synaptic',
-          link: 'synaptic/plot.html',
-          status: 'In Progress',
-          description: 'Learning how to use npm modules in-browser and some basic ML work'
+          title: 'Voronoi',
+          link: 'voronoi/plot.html',
+          status: 'Complete',
+          description: 'Trying to implement a voronoi diagram on top of some data. Ideally it serves as a visualization of nearest neighbors'
         }
-      ]
+      ].sort((a, b) => a.status > b.status)
 
       // project links
       var links = d3.select('#content').selectAll('a')
