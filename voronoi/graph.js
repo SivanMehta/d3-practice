@@ -59,7 +59,7 @@ function showTooltip(pt) {
 }
 
 function redrawPolygon(polygon) {
-  polygon.attr("d", function(d) { return d ? "M" + d.join("L") + "Z" : null; });
+  polygon.attr("d", function(d) { return d ? "M" + d.join("L") + "Z" : null; })
 }
 
 d3.csv("./boomerang.csv", (err, data) => {
@@ -74,18 +74,17 @@ d3.csv("./boomerang.csv", (err, data) => {
   var polygon = svg.append("g")
     .attr("class", "polygons")
     .selectAll("path")
-    .data(voronoi.polygons(polygonData))
-    .enter().append("path")
-      .call(redrawPolygon);
+    .data(voronoi.polygons(polygonData)).enter()
+      .append("path")
+      .call(redrawPolygon)
 
   svg.selectAll('dot')
     .data(data).enter()
     .append('circle')
-    .attr('r', 5)
+    .attr('r', 3)
     .attr('cx', d => x(d.x))
     .attr('cy', d => y(d.y))
     .attr('fill', d => color(d.label))
-    .on('mouseover', showTooltip)
 
   // Add the axes
   svg.append("g")
