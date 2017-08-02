@@ -3,6 +3,7 @@
 var layer_defs = [];
 layer_defs.push({type:'input', out_sx:1, out_sy:1, out_depth:2});
 layer_defs.push({type:'fc', num_neurons:6, activation: 'tanh'});
+layer_defs.push({type:'fc', num_neurons:4, activation: 'tanh'});
 layer_defs.push({type:'fc', num_neurons:2, activation: 'tanh'});
 layer_defs.push({type:'softmax', num_classes:2});
 
@@ -19,7 +20,7 @@ function train(data) {
     trainer.train(x, row.label)
   })
 
-  console.log("Generation " + ++iteration)
+  generation.text("Generation "+ ++iteration)
 }
 
 // Graphing
@@ -48,6 +49,10 @@ var svg = d3.select('#graph').append('svg')
   .style('position', 'absoloute')
   .append('g')
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+
+var generation = svg.append('text')
+  .attr('x', x(2))
+  .attr('y', y(1.75))
 
 function showTooltip(pt) {
   svg.select('.tooltip').remove()
@@ -111,5 +116,5 @@ d3.csv("./boomerang.csv", (err, data) => {
 
   d3.select('#graph').on('click', guessPoint)
 
-  setInterval(train, 1000, data)
+  setInterval(train, 100, data)
 })
