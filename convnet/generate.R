@@ -1,15 +1,17 @@
 library(dplyr)
 
-x1 <- runif(2000, 0, 2)
-y1 <- runif(2000, 0, 2)
+n <- 2000
+
+x1 <- runif(n, 0, 2)
+y1 <- runif(n, 0, 2)
 upper <- data.frame(x1, y1) %>%
   filter((x1 - 1)**2 + (y1 - 1)**2 < 1) %>%
   filter((x1 - 1)**2 + (y1 - 1)**2 > .4) %>%
   filter(y1 > 1) %>%
   mutate(label = 'upper')
 
-x2 <- runif(2000, .75, 2.75)
-y2 <- runif(2000, 0.5, 2.5)
+x2 <- runif(n, .75, 2.75)
+y2 <- runif(n, 0.5, 2.5)
 lower <- data.frame(x2, y2) %>%
   filter((x2 - 1.75)**2 + (y2 - 1.5)**2 < 1) %>%
   filter((x2 - 1.75)**2 + (y2 - 1.5)**2 > .4) %>%
